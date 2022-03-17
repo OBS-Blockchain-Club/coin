@@ -1,6 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import { useState } from 'react';
+import { Button, Spinner } from '@chakra-ui/react';
 const ethers = require('ethers');
 
 function App() {
@@ -13,23 +14,27 @@ function App() {
 
   const [account, setAccount] = useState(''); // creates an empty string that can be changed, and is accessible throughout the program
 
-  const coin = "0x8c28aC98a5Af084c85354FcC86967e1b948385A9"
+  const coin = '0x8c28aC98a5Af084c85354FcC86967e1b948385A9' // PUT IN YOUR OWN COIN CONTRACT HERE
 
+  // name
   const [name, setName] = useState('');
 
+  // symbol
   const [symbol, setSymbol] = useState('');
 
+  // your balance
   const [balance, setBalance] = useState();
+
+
+  // ability to transfer and create new coins
 
   const connect = async () => {
     const accounts = await window.ethereum.request({method: 'eth_requestAccounts'})
     setAccount(accounts[0])
 
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
-    // gives you data from the blockchain
+	const provider = new ethers.providers.Web3Provider(window.ethereum)
 
-    const signer = provider.getSigner()
-    // provider + allows you to write stuff to the blockchain
+	const signer = provider.getSigner()
 
     const coinContract = new ethers.Contract(coin, ABI, signer)
     
@@ -43,53 +48,49 @@ function App() {
     setBalance((await coinContract.balances(account)).toNumber())
   }
 
+	setSymbol(await coinContract.symbol())
+
+	console.log(await coinContract.balances(account))
+
+	setBalance((await coinContract.balances(account)).toNumber())
+
+  }
+
   connect() // setting account variable to whatever was returned (given to us) in the connect function
 
-  // function to create new coins
-  const mint = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
-    // gives you data from the blockchain
-
-    const signer = provider.getSigner()
-    // provider + allows you to write stuff to the blockchain
-
-    const coinContract = new ethers.Contract(coin, ABI, signer)
-    
-    try {
-      await coinContract.mint(100000)
-    } catch(error) {
-      console.log(error.message)
-    }
-  }
-
-  // function to transfer coins to another person
   const transfer = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum)
-    // gives you data from the blockchain
 
-    const signer = provider.getSigner()
-    // provider + allows you to write stuff to the blockchain
+	const provider = new ethers.providers.Web3Provider(window.ethereum)
 
-    const coinContract = new ethers.Contract(coin, ABI, signer)
-    
-    try {
-      await coinContract.transfer('0x5fc7ea45013d40ecc3979f7dca53035480e52750', 200)
-    } catch(error) {
-      console.log(error)
-    }
+	const signer = provider.getSigner()
+
+	const coinContract = new ethers.Contract(coin, ABI, signer)
+
+	const result = await coinContract.transfer('0x2568e7fBB94f91B159E4EC34839635ad85Ab65C7', 200)
+
   }
+
+  console.log(balance)
 
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          {account}
-        </p>
-        <p>Name of Coin: {name}</p>
-        <p>Balance: {balance} {symbol}</p>
-        <button onClick={transfer}>Transfer coins</button>
-        <button onClick={mint}>Create 100000 coins</button>
+		{
+			balance == null ?
+				<Spinner size='xl'/>
+			: 
+				<div>
+					<p>
+					{account}
+					</p>
+					<p>{name}</p>
+					<p>{symbol}</p>
+					<p>Your Balance: {balance}</p>
+
+					<Button colorScheme='blue' onClick={transfer}>Transfer 200 coins</Button>
+				</div>
+		}
+
       </header>
     </div>
   );
