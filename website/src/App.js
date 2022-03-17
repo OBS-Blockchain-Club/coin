@@ -36,17 +36,11 @@ function App() {
 
 	const signer = provider.getSigner()
 
-    const coinContract = new ethers.Contract(coin, ABI, signer)
-    
-    // getting the coin's name
-    setName(await coinContract.name())
+	const coinContract = new ethers.Contract(coin, ABI, signer)
 
-    // getting the coin's symbol --> ex: for Dollars the symbol is USD
-    setSymbol(await coinContract.symbol())
+	console.log(coinContract)
 
-    // checking how many coins I have in my account
-    setBalance((await coinContract.balances(account)).toNumber())
-  }
+	setName(await coinContract.name())
 
 	setSymbol(await coinContract.symbol())
 
