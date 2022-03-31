@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import { useState } from 'react';
-import { Button, Spinner } from '@chakra-ui/react';
+import { Button, HStack, Input, Spinner, Stack, VStack } from '@chakra-ui/react';
 const ethers = require('ethers');
 
 function App() {
@@ -11,6 +11,8 @@ function App() {
   // Global variables that we want are:
   // - my ethereum account
   // - coin smart contract (program)
+
+  // 31rst March - better UI from Chakra UI
 
   const [account, setAccount] = useState(''); // creates an empty string that can be changed, and is accessible throughout the program
 
@@ -25,12 +27,22 @@ function App() {
   // your balance
   const [balance, setBalance] = useState();
 
+  // recipient address
+  const [recipient, setRecipient] = useState('');
+
+  // amount to send
+  const [amount, setAmount] = useState(100);
 
   // ability to transfer and create new coins
 
-  const connect = async () => {
+
+  // connect your metamask account when you click on the metamask button
+  const metamask = async () => {
     const accounts = await window.ethereum.request({method: 'eth_requestAccounts'})
     setAccount(accounts[0])
+  }
+
+  const connect = async () => {
 
 	const provider = new ethers.providers.Web3Provider(window.ethereum)
 
@@ -60,31 +72,49 @@ function App() {
 
 	const coinContract = new ethers.Contract(coin, ABI, signer)
 
-	const result = await coinContract.transfer('0x2568e7fBB94f91B159E4EC34839635ad85Ab65C7', 200)
+	const result = await coinContract.transfer(recipient, amount)
 
   }
-
-  console.log(balance)
 
   return (
     <div className="App">
       <header className="App-header">
 		{
 			balance == null ?
-				<Spinner size='xl'/>
+				<>
+					<Button 
+						colorScheme={'blue'}
+						onClick={metamask}
+						m={'5'}
+					>
+						Connect {" "} 
+						<img src='/metamask.svg'/>
+					</Button>
+					<Spinner size='xl'/>
+				</>
 			: 
 				<div>
-					<p>
-					{account}
-					</p>
-					<p>{name}</p>
-					<p>{symbol}</p>
-					<p>Your Balance: {balance}</p>
+					<VStack>
+						<p>
+						{account.substring(0, 6)}...{account.substring(account.length - 4)}
+						</p>
+						<HStack>
+							<p>Name: {name}</p>
+							<p>Symbol: {symbol}</p>
+						</HStack>
+						<p>Your Balance: {balance} {symbol}</p>
 
-					<Button colorScheme='blue' onClick={transfer}>Transfer 200 coins</Button>
+						<HStack>
+							<Input 
+								placeholder={"Enter the receiver's address"} 
+								onChange={(e) => {setRecipient(e.target.value)}} 
+								/>
+							<Button colorScheme='blue' onClick={transfer}>Transfer</Button>
+						</HStack>
+					</VStack>
+
 				</div>
 		}
-
       </header>
     </div>
   );
