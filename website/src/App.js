@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import { useState } from 'react';
-import { Button, HStack, Input, Spinner, Stack, VStack } from '@chakra-ui/react';
+import { Box, Button, HStack, Input, Spinner, Stack, Text, VStack } from '@chakra-ui/react';
 const ethers = require('ethers');
 
 function App() {
@@ -95,6 +95,7 @@ function App() {
 			: 
 				<div>
 					<VStack>
+						<Box as='hl' size='lg'>{balance} {symbol}</Box>
 						<p>
 						{account.substring(0, 6)}...{account.substring(account.length - 4)}
 						</p>
@@ -102,7 +103,7 @@ function App() {
 							<p>Name: {name}</p>
 							<p>Symbol: {symbol}</p>
 						</HStack>
-						<p>Your Balance: {balance} {symbol}</p>
+						
 
 						<HStack>
 							<Input 
